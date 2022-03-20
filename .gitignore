@@ -53,3 +53,7 @@ dkms.conf
 a.out
 *.swp*
 ansi_anim/*
+inc/*
+obj/*
+bin/*
+
