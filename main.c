@@ -37,10 +37,11 @@ int main(int argc, char *argv[]){
 
   int prev_val = 0;
   while(1){
-    if(!touch_read(BIG_BUTTON, &buf[0]) && !touch_read(SLIDER, &buf[1])){
+    if(touch_read(BIG_BUTTON, &buf[0]) && touch_read(SLIDER, &buf[1])){
       perror("Read failed\n");
       return EXIT_FAILURE;
     }
+    usleep(50 * 1000);
 
     switch(buf[0]){
 //      case 0 : printf("-\n") ;
@@ -56,6 +57,7 @@ int main(int argc, char *argv[]){
     }
 
     prev_val = buf[1];
+    buf[0] = 0;
 
   }
 
