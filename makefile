@@ -1,8 +1,9 @@
 CC=gcc
-
+INC = -Iinc -Iansilib/inc
+CFLAGS = $(INC) 
 
 all	: main.c
-	$(CC) $^ -o Animate
+	$(CC) $(INC) $^ -o Animate
 
 run	:	
 	./Animate
