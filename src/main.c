@@ -71,7 +71,7 @@ void prnt_scr(screen_t *ptr){
   *ptr = get_screen_size();
  MAX_COLS = ptr->cols;
  MAX_ROWS = ptr->lines;
-  printf("MAX_COL = %d; MAX_ROW = %d", MAX_COLS, MAX_ROWS);
+  printws(NULL, "MAX_COL = %d; MAX_ROW = %d", MAX_COLS, MAX_ROWS);
 }
 
 int touch_init(void){
@@ -87,6 +87,7 @@ int touch_init(void){
     
   }
 
+  printf("%d\n", fd);
   return 0;
   
 }
@@ -119,35 +120,77 @@ int main(int argc, char *argv[]){
   enable_raw_mode();
   screen_t screen_size;
   prnt_scr(&screen_size);
+  point_t cur_cursor;
   clear_screen(); 
   int prev_val = 0;
   char c;
+  printws(NULL, "\033[?25l");
+
+
+  style_t test_style[] = {
+      /*   fg            bg             mode       */
+      { BLUE_FG,    YELLOW_BG,       BLINKING}, /* [0] */
+      { BLUE_FG,    RED_BG,       BOLD}       /* [1] */
+  };
+
+
+   /* Prepare some demo shape */
+  box_t shape[] = {
+      {   /* [0] */
+          RECTANGLE,                      /*                     type */
+          { 0, 12 },                     /*                   origin */
+          test_style[0], test_style[1],   /*     border & fill styles */
+          12, 13,                         /*           width & height */
+          '#', '/',                       /* border & fill characters */
+  }};
+
+  draw(&shape[0]);
 
   while(1){
-    if(touch_read(BIG_BUTTON, &buf[0]) && touch_read(SLIDER, &buf[1])){
+    if(touch_read(BIG_BUTTON, &buf[0]) || touch_read(SLIDER, &buf[1])){
       perror("Read failed\n");
       return EXIT_FAILURE;
 
     }
-    switch(buf[0]){
-      case 1 : printf("|\n\r");
-               break;
-      case 2 : printf("+\n\r");
-               break;
-    }
-    if(buf[1] < prev_val){
-      printf("2\n") ;
-    }
-    prev_val = buf[1];
-    buf[0] = 0;
 
-   read(STDIN_FILENO, &c, 1);
-   if(c == 'q')
+    erase(&shape[0]);
+    switch(buf[0]){
+      case 1 : 
+               shape[0].border.bg++;
+               if(shape[0].border.bg > DEFAULT_BG)
+                shape[0].border.bg = BLACK_BG;
+               break;
+
+      case 2 : 
+               shape[0].fill.bg++;
+               if(shape[0].fill.bg > DEFAULT_BG)
+                shape[0].fill.bg = BLACK_BG;
+               break;
+
+      case 3 :
+               cur_cursor = get_cursor_pos();
+               shape[0].origin.x = 0;
+               shape[0].origin.y = 12;
+               break;
+
+    }
+
+    if(buf[1] > 0){
+      nudge(&shape[0], RIGHT, buf[1]/10);
+      prev_val = buf[1];
+
+    }
+
+    draw(&shape[0]);
+    buf[0] = 0;
+    read(STDIN_FILENO, &c, 1);
+    if(c == 'q')
      break;
-   usleep(20 * 1000);
+    usleep(20 * 1000);
 
   }
 
+  clear_screen();
   disable_raw_mode();
   
   return 0;
