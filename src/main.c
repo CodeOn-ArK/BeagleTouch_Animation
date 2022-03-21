@@ -22,6 +22,7 @@
 int fd;
 int buf[2] = {0};
 struct termios orig_termios;    /* Keeps the original attributes */
+uint32_t MAX_COLS,MAX_ROWS ;
 
 
 static inline void enable_raw_mode(void)
@@ -66,42 +67,11 @@ static inline void disable_raw_mode(void)
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-
-int main(int argc, char *argv[]){
-  if(touch_init())
-    return EXIT_FAILURE;
-
-  int prev_val = 0;
-  while(1){
-    if(touch_read(BIG_BUTTON, &buf[0]) && touch_read(SLIDER, &buf[1])){
-      perror("Read failed\n");
-      return EXIT_FAILURE;
-    }
-    usleep(50 * 1000);
-
-    enable_raw_mode();
-
-    switch(buf[0]){
-//      case 0 : printf("-\n") ;
-//               break;
-      case 1 : printf("|\n");
-               break;
-      case 2 : printf("+\n");
-               break;
-    }
-
-    if(buf[1] < prev_val){
-      printf("2\n") ;
-    }
-
-    prev_val = buf[1];
-    buf[0] = 0;
-
-  }
-
-  disable_raw_mode();
-  
-  return 0;
+void prnt_scr(screen_t *ptr){
+  *ptr = get_screen_size();
+ MAX_COLS = ptr->cols;
+ MAX_ROWS = ptr->lines;
+  printf("MAX_COL = %d; MAX_ROW = %d", MAX_COLS, MAX_ROWS);
 }
 
 int touch_init(void){
@@ -131,14 +101,55 @@ int touch_read(uint8_t base_addr, int *pBuffer)
   if (ret <= 0)
   {
       perror("write address failed\n");
-      return -1;
+      return 1;
   }
 
   ret = read(fd,pBuffer,1);
   if(ret <= 0)
   {
       perror("read failed\n");
+      return 1;
   }
+  return 0;
+}
+
+int main(int argc, char *argv[]){
+  if(touch_init())
+    return EXIT_FAILURE;
+  enable_raw_mode();
+  screen_t screen_size;
+  prnt_scr(&screen_size);
+  clear_screen(); 
+  int prev_val = 0;
+  char c;
+
+  while(1){
+    if(touch_read(BIG_BUTTON, &buf[0]) && touch_read(SLIDER, &buf[1])){
+      perror("Read failed\n");
+      return EXIT_FAILURE;
+
+    }
+    switch(buf[0]){
+      case 1 : printf("|\n\r");
+               break;
+      case 2 : printf("+\n\r");
+               break;
+    }
+    if(buf[1] < prev_val){
+      printf("2\n") ;
+    }
+    prev_val = buf[1];
+    buf[0] = 0;
+
+   read(STDIN_FILENO, &c, 1);
+   if(c == 'q')
+     break;
+   usleep(20 * 1000);
+
+  }
+
+  disable_raw_mode();
+  
   return 0;
 }
 
