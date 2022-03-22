@@ -129,8 +129,8 @@ int main(int argc, char *argv[]){
 
   style_t test_style[] = {
       /*   fg            bg             mode       */
-      { BLUE_FG,    YELLOW_BG,       BLINKING}, /* [0] */
-      { BLUE_FG,    RED_BG,       BOLD}       /* [1] */
+      { BLUE_FG,    YELLOW_BG,       BOLD}, /* [0] */
+      { BLUE_FG,    RED_BG,       BLINKING}       /* [1] */
   };
 
 
