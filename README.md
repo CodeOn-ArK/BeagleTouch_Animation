@@ -3,7 +3,7 @@
 
 A project involving interfacing `Capacacitive Touch sensor (CY8C401)` with the BeagleBone Green's I2C driver and controlling an user space application using the sensor created with `ANSI_ANIM` lib
 
-[![demo](https://asciinema.org/a/KrGRTQtL0rXSZ9Z1SKNgOhWBE.svg)](https://asciinema.org/a/KrGRTQtL0rXSZ9Z1SKNgOhWBE)
+[![demo](https://asciinema.org/a/PX9BwMV06lbcqUCMdwdzBQbvE.svg)](https://asciinema.org/a/PX9BwMV06lbcqUCMdwdzBQbvE)
 
 ## About ansilib
 
