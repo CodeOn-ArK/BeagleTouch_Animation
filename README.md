@@ -2,40 +2,41 @@
 
 
 A project involving interfacing `Capacacitive Touch sensor (CY8C401)` with the BeagleBone Green's I2C driver and controlling an user space application using the sensor created with `ANSI_ANIM` lib
+The following tree explains the structure of the project :
 
 ```
-❯ tree
-.
-├── ansilib
-│   ├── inc
-│   │   ├── ansi
-│   │   │   ├── colors.h
-│   │   │   ├── common.h
-│   │   │   ├── cursor.h
-│   │   │   ├── screen.h
-│   │   │   └── style.h
-│   │   └── graphics
-│   │       ├── box.h
-│   │       ├── common.h
-│   │       └── shapes.h
-│   └── src
-│       ├── ansi
-│       │   ├── cursor.c
-│       │   ├── screen.c
-│       │   └── style.c
-│       └── graphics
-│           ├── box.c
-│           ├── common.c
-│           └── shapes.c
-├── inc
-│   ├── io.h
-│   └── main.h
-├── LICENSE
-├── makefile
-├── README.md
-└── src
-    ├── io.c
-    └── main.c
+            ❯ tree
+            .
+            ├── ansilib
+            │   ├── inc
+            │   │   ├── ansi
+            │   │   │   ├── colors.h
+            │   │   │   ├── common.h
+            │   │   │   ├── cursor.h
+            │   │   │   ├── screen.h
+            │   │   │   └── style.h
+            │   │   └── graphics
+            │   │       ├── box.h
+            │   │       ├── common.h
+            │   │       └── shapes.h
+            │   └── src
+            │       ├── ansi
+            │       │   ├── cursor.c
+            │       │   ├── screen.c
+            │       │   └── style.c
+            │       └── graphics
+            │           ├── box.c
+            │           ├── common.c
+            │           └── shapes.c
+            ├── inc
+            │   ├── io.h
+            │   └── main.h
+            ├── LICENSE
+            ├── makefile
+            ├── README.md
+            └── src
+                ├── io.c
+                └── main.c
 
 9 directories, 21 files
 ```
@@ -43,11 +44,6 @@ A project involving interfacing `Capacacitive Touch sensor (CY8C401)` with the B
 
 [![demo](https://asciinema.org/a/PX9BwMV06lbcqUCMdwdzBQbvE.svg)](https://asciinema.org/a/PX9BwMV06lbcqUCMdwdzBQbvE)
 
-## About ansilib
-
-Ansilib is a tiny lib meant for some neat and simple command-line based graphics. It can render rectangles, triangles and squares as of now.
-The features of the shape can be independently modified to give different color/character for border area or fill area.
-![Click here](https://github.com/CodeOn-ArK/ansi_anim) to know about the ANSI lib.
 
 ## `Linux System Programming` and the `project`
 
@@ -62,6 +58,21 @@ It interfaces with a `capacitive touch panel` based on `cy8c401`  to read user d
 
 The program polls the  register pair continuously and concurrently updates the ANSI graphics on the terminal
 The buttons are used to change the border/fill colour while the slider is used to change the position of the shapes drawn on screen
+
+The program starts at `main.c`, as usual, and then inits the required drivers as described.
+It performs `IOCTL` syscall to setup I2C_DRIVER. It sends the I2C_SLAVE_ADDR signal along with the address of the I2C_SLAVE which is `0x08` in this case.
+After setting up the driver for interacting with the slave, we can then read/write the registers of the SLAVE via `read()`/`write()` syscalls, which take the adress and/or the data to be written/read to/from the slave.
+
+The resultant key combinations are then read from the sensor via `read()` syscall, which reads the data into a variable passed into the API. The value is then read which in turn is used to influence the graphics on terminal. This graphic element has been created using `ANSILIB` as mentioned next.
+
+This demo illustrates the power of Linux System Calls using a project based on Linux System Programming.
+
+## About ansilib
+
+Ansilib is a tiny lib meant for some neat and simple command-line based graphics. It can render rectangles, triangles and squares as of now.
+The features of the shape can be independently modified to give different color/character for border area or fill area.
+![Click here](https://github.com/CodeOn-ArK/ansi_anim) to know about the ANSI lib.
+
 
 ![plot](https://files.seeedstudio.com/wiki/Grove-Capacitive_Touch_Slide_Sensor-CY8C4014LQI/img/main.jpg)
 
